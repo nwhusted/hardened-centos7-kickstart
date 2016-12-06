@@ -117,7 +117,7 @@ class Display_Menu:
 
                 # Blank Label
                 self.label = gtk.Label("")
-                self.vbox.add(self.label)    
+                self.vbox.add(self.label)
 
 		# System Configuration
                 self.system = gtk.HBox()
@@ -133,13 +133,13 @@ class Display_Menu:
 				self.hostname.set_text('localhost.localdomain')
 		except:
 			self.hostname.set_text('localhost.localdomain')
-		self.label = gtk.Label("              System Profile: ")                
+		self.label = gtk.Label("              System Profile: ")
 		self.system.pack_start(self.label,False,True, 0)
                 self.system_profile = gtk.combo_box_new_text()
 		self.system_profile.append_text("Minimal Installation")
 		self.system_profile.append_text("IPA Authentication Server")
 		self.system_profile.append_text("Ovirt/KVM Server")
-		self.system_profile.append_text("User Workstation")
+		self.system_profile.append_text("Developer Workstation")
 		self.system_profile.append_text("Standalone KVM Server")
 		self.system_profile.set_active(0)
 		self.system_profile.connect('changed',self.configure_system_profile)
@@ -198,7 +198,7 @@ class Display_Menu:
 			for line in f:
 				self.system_memory[line.split(':')[0]] = line.split(':')[1].strip()
 		f.close()
-						
+
                 self.cpu_information = gtk.HBox()
                 self.label = gtk.Label("   CPU Model: ")
                 self.cpu_information.pack_start(self.label,False,True, 0)
@@ -244,7 +244,7 @@ class Display_Menu:
                         self.line = self.line.strip()
 			if not ('fd0' in self.line or 'sr0' in self.line):
 				self.disk_info.append(self.line.split(' '))
-               
+
 		self.label = gtk.Label("   Available Disks: ")
                 self.disk_list.pack_start(self.label, False, True, 0)
 
@@ -434,7 +434,7 @@ class Display_Menu:
 
 	# Key Press Event
 	def event_key(self,args,event):
-		if event.keyval == gtk.keysyms.F12:	
+		if event.keyval == gtk.keysyms.F12:
 			self.apply_configuration(args)
 		elif event.keyval == gtk.keysyms.F1:
 			self.show_help_main(args)
@@ -541,7 +541,7 @@ class Display_Menu:
 			f.write('ipa-client\n')
 			f.write('ipa-server-dns\n')
 			f.close()
-			
+
 		################################################################################################################
 		# Ovirt KVM Server
 		################################################################################################################
@@ -597,7 +597,7 @@ class Display_Menu:
 
 
 		################################################################################################################
-		# User Workstation
+		# User Developer Workstation
 		################################################################################################################
 		if int(self.system_profile.get_active()) == 3:
 			# Partitioning
@@ -630,6 +630,13 @@ class Display_Menu:
 			# Package Selection
 			f = open('/tmp/hardening-packages','w')
 			f.write('@x-window-system\n')
+			f.write('@development\n')
+			f.write('@additional-devel\n')
+                        f.write('@platform-devel\n')
+                        f.write('@directory-client\n')
+                        f.write('@emacs\n')
+                        f.write('@fonts\n')
+                        f.write('k3b\n')
 			f.write('liberation*\n')
 			f.write('dejavu*\n')
 			f.write('firewall-config\n')
@@ -733,12 +740,12 @@ class Display_Menu:
 	# Display Message Box (e.g. Help Screen, Warning Screen, etc.)
 	def MessageBox(self,parent,text,type=gtk.MESSAGE_INFO):
                 message = gtk.MessageDialog(parent,0,type,gtk.BUTTONS_OK)
-		message.set_markup(text)	
+		message.set_markup(text)
 		response = message.run()
 		if response == gtk.RESPONSE_OK:
 			message.destroy()
 
-		
+
 	# Get Password
 	def get_password(self,parent):
 		dialog = gtk.Dialog("Configure System Password",parent,gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,(gtk.STOCK_CANCEL,gtk.RESPONSE_REJECT,gtk.STOCK_OK,gtk.RESPONSE_ACCEPT))
@@ -861,9 +868,9 @@ class Display_Menu:
 			self.network_gateway = self.gateway.get_text()
 			self.network_dns1 = self.dns1.get_text()
 			self.network_dns2 = self.dns2.get_text()
-			
+
 			# Write Network Configuration File
-			if self.dhcp.get_active() == True:			
+			if self.dhcp.get_active() == True:
 				f = open('/tmp/networking','w')
 				f.write('network --bootproto=dhcp --device='+str(self.network_name)+' --noipv6 --activate\n')
 				f.close()
@@ -873,7 +880,7 @@ class Display_Menu:
 				f.close()
 
 			self.network_dialog.destroy()
-				
+
 
 	# DHCP Button Toggle
 	def check_network(self,widget,event=None):
@@ -913,7 +920,7 @@ class Display_Menu:
 
 		if self.network_error == 1:
 			self.network_dialog.set_response_sensitive(gtk.RESPONSE_ACCEPT,False)
-			return False	
+			return False
 		else:
 			self.network_dialog.set_response_sensitive(gtk.RESPONSE_ACCEPT,True)
 			return True
@@ -923,7 +930,7 @@ class Display_Menu:
         def apply_configuration(self,args):
 
 		# FIPS 140-2 Configuration
-		if self.fips_kernel.get_active() == True:			
+		if self.fips_kernel.get_active() == True:
 			f = open('/tmp/hardening-post','a')
 			# Enable FIPS 140-2 mode in Kernel
 			f.write('\n/root/hardening/fips-kernel-mode.sh\n')
@@ -942,14 +949,14 @@ class Display_Menu:
 					self.MessageBox(self.window,"<b>Password too short! 15 Characters Required.</b>",gtk.MESSAGE_ERROR)
 			else:
 				self.MessageBox(self.window,"<b>Passwords Don't Match!</b>",gtk.MESSAGE_ERROR)
-			
+
                 self.error = 0
 
 		if self.verify.check_hostname(self.hostname.get_text()) == False:
 			self.MessageBox(self.window,"<b>Invalid Hostname!</b>",gtk.MESSAGE_ERROR)
 			self.error = 1
 
-		# Check Install Disks	
+		# Check Install Disks
 		self.install_disks = ""
 		self.ignore_disks = ""
 		for i in range(len(self.disk_info)):
