@@ -5,6 +5,7 @@
 # Last update was 29 Nov 2016
 #
 # Author: Frank Caviggia (fcaviggia@gmail.com)
+# Changes by: Nathaniel Husted (nhusted@gmail.com)
 # Copyright: Frank Caviggia, (c) 2016
 # License: GPLv2
 # Description: Hardened Installation of CentOS 7
@@ -103,6 +104,8 @@ createiso.sh - installation script to modify CentOS 7.2+ ISO image
 
 HARDENING INFORMATION
 =====================
+
+NOTE: SCAP Security Guide adds 'nousb' parameter to the kernel boot options. This must be removed for any usb keyboard and mouse to work properly. Even the SCAP guide makes clear this is applicable to very few systems.
 
 Here is some additional information added by the supplemental hardening script
 in addition to the SSG:
